@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>LumiNote — Bloco de Notas</title>
+<style>
+:root{
+ --bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#718096;--line:#e3e8f0;
+ --primary:#f557d3;--primary2:#8b5cf6;--cyan:#20b8d8;--green:#23c288;
+ text-decoration-skip-ink:#f872a8;--red:#991662d7;--shadow:0 14px 40px #25324b18;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.entry{height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 20% 20%,#ddd9ff,transparent 35%),linear-gradient(135deg,#f5f3ff,#e9f9ff)}
+.entry-card{width:min(460px,92%);padding:42px 38px;background:#ffffffd9;backdrop-filter:blur(18px);border:1px solid #ffffff;border-radius:28px;box-shadow:var(--shadow);text-align:center}
+.login-form{display:grid;gap:12px;text-align:left;margin-top:22px}.login-form label{font-size:13px;font-weight:700;color:#526079;margin-bottom:-7px}.login-form input{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:11px;background:#fff;outline:none}.login-form input:focus{border-color:var(--primary);box-shadow:0 0 0 3px #6557f51a}.login-form .primary{width:100%;margin-top:5px}.forgot-link{display:block;text-align:right;color:var(--primary);font-size:13px;text-decoration:none;font-weight:600;margin-top:-3px}.forgot-link:hover{text-decoration:underline}.login-error{display:none;color:#fd1034;background:#ffe7eb;padding:9px 11px;border-radius:9px;font-size:13px;text-align:center}
+.lamp{width:100px;height:100px;margin:0 auto 22px;border-radius:30px;display:grid;place-items:center;font-size:52px;background:linear-gradient(135deg,#6d5dfc,#a855f7);box-shadow:0 16px 35px #6557f544}
+.entry h1{font-size:34px;margin-bottom:8px}.entry p{color:var(--muted);line-height:1.6;margin-bottom:26px}
+.primary{border:0;color:white;background:linear-gradient(135deg,var(--primary),var(--primary2));padding:13px 22px;border-radius:12px;font-weight:700;box-shadow:0 8px 18px #6557f544}
+.primary:hover{transform:translateY(-1px)}
+.app{height:100vh;display:none;grid-template-columns:250px 1fr 310px}
+.sidebar{background:#fff;border-right:1px solid var(--line);padding:18px 14px;display:flex;flex-direction:column;min-width:0}
+.brand{display:flex;align-items:center;gap:10px;padding:7px 9px 20px;font-weight:800;font-size:20px}
+.brand-icon{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary),var(--primary2));color:white}
+.nav{display:grid;gap:5px}.nav button{border:0;background:transparent;text-align:left;padding:11px 13px;border-radius:10px;color:#526079}.nav button:hover,.nav button.active{background:#f0efff;color:var(--primary);font-weight:700}
+.section-title{font-size:11px;text-transform:uppercase;color:#9aa5b5;font-weight:800;margin:20px 10px 7px}
+.side-bottom{margin-top:auto;display:grid;gap:6px}
+.main{min-width:0;display:flex;flex-direction:column;background:var(--bg)}
+.topbar{height:62px;background:#ffffffdd;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:0 18px}
+.search{flex:1;max-width:560px;position:relative}.search input{width:100%;border:1px solid var(--line);background:#f8faff;border-radius:11px;padding:10px 14px 10px 38px;outline:none}.search span{position:absolute;left:13px;top:9px}
+.iconbtn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 11px;color:#56627a}.iconbtn:hover{background:#f0efff;color:var(--primary)}
+.content{padding:24px;overflow:auto;flex:1}.welcome{display:flex;justify-content:space-between;align-items:end;margin-bottom:20px}.welcome h2{font-size:26px}.welcome p{color:var(--muted);margin-top:4px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:20px}.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 4px 15px #26334a08}.stat b{font-size:25px}.stat small{display:block;color:var(--muted);margin-top:4px}
+.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 4px 18px #26334a08}.panel h3{margin-bottom:14px}.notes{display:grid;gap:10px}.note{border:1px solid var(--line);border-radius:13px;padding:13px;display:flex;gap:12px;align-items:flex-start;cursor:pointer}.note:hover{border-color:#c9c4ff;background:#fbfaff}.note .icon-type{font-size:16px;margin-top:2px}.note h4{margin-bottom:4px}.note p{font-size:13px;color:var(--muted)}.tag{font-size:11px;padding:4px 7px;border-radius:20px;background:#eef0ff;color:var(--primary);white-space:nowrap}
+.task{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.task:last-child{border-bottom:0}.task input{accent-color:var(--primary)}.priority{margin-left:auto;font-size:10px;font-weight:800;padding:4px 7px;border-radius:20px}.high{background:#ffe7eb;color:#d93d55}.medium{background:#fff3d6;color:#f9c666}.low{background:#e4f8ef;color:#12825c}
+.rightbar{background:#fff;border-left:1px solid var(--line);padding:18px;overflow:auto}.rightbar h3{margin:4px 0 14px}.contact{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}.avatar{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#d8d2ff,#c7f2ff);display:grid;place-items:center;font-weight:800;color:#5548c8}.contact small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.help{margin-top:18px;background:linear-gradient(135deg,#f0edff,#e8fbff);padding:16px;border-radius:16px}.help button{border:0;background:var(--primary);color:white;padding:9px 12px;border-radius:9px;margin-top:10px}
+.modal{position:fixed;inset:0;background:#11182766;display:none;place-items:center;z-index:30;padding:20px}.modal-box{width:min(850px,96vw);max-height:92vh;overflow:auto;background:#fff;border-radius:20px;padding:22px;box-shadow:var(--shadow)}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.close{border:0;background:#f1f3f7;border-radius:9px;padding:8px}.form{display:grid;gap:11px}.form input,.form textarea,.form select{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px;outline:none}.form textarea{min-height:180px;resize:vertical}.toolbar{display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#f7f8fc;border:1px solid var(--line);border-radius:10px}.toolbar button{border:0;background:white;border:1px solid var(--line);border-radius:7px;padding:7px 9px}.toolbar input[type=color]{width:35px;height:32px;padding:2px}.visibility{display:flex;gap:8px}.choice{border:1px solid var(--line);padding:9px 12px;border-radius:9px}.choice input{margin-right:5px}.chat{position:fixed;inset:0;background:#11182770;display:none;z-index:40;padding:25px}.chat-box{width:min(900px,100%);height:100%;margin:auto;background:#fff;border-radius:20px;display:flex;flex-direction:column;overflow:hidden}.chat-head{padding:15px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}.messages{flex:1;padding:20px;overflow:auto;background:#f6f8fc}.msg{max-width:70%;padding:10px 13px;border-radius:14px;margin-bottom:10px;background:white;box-shadow:0 3px 10px #26334a08}.msg.me{margin-left:auto;background:#eae7ff}.chat-input{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}.chat-input input{flex:1;border:1px solid var(--line);border-radius:10px;padding:11px}
+.empty{color:var(--muted);padding:25px;text-align:center}
+@media(max-width:1050px){.app{grid-template-columns:210px 1fr}.rightbar{display:none}.cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.app{grid-template-columns:1fr}.sidebar{display:none}.cards,.grid{grid-template-columns:1fr}.content{padding:14px}.topbar{padding:0 10px}.search{max-width:none}.welcome{align-items:start;gap:10px;flex-direction:column}}
+</style>
+</head>
+
+<body>
+
+<section class="entry" id="entry">
+  <div class="entry-card">
+    <div class="lamp">💡</div>
+    <h1>LumiNote</h1>
+    <p>Seu espaço inteligente para anotações, tarefas, trabalhos em grupo e ideias. Organize tudo em um só lugar.</p>
+    <form class="login-form" onsubmit="event.preventDefault(); entrar();">
+      <label for="loginUsuario">Gmail</label>
+      <input id="loginUsuario" type="email" placeholder="Digite seu Gmail" autocomplete="email" required>
+      <label for="loginSenha">Senha</label>
+      <input id="loginSenha" type="password" placeholder="Digite sua senha" autocomplete="current-password" required>
+      <a class="forgot-link" href="#" onclick="esqueceuSenha(event)">Esqueceu a senha?</a>
+      <div class="login-error" id="loginError">Preencha seu login e sua senha para continuar.</div>
+      <button class="primary" type="submit">Entrar</button>
+    </form>
+  </div>
+</section>
+
+<div class="app" id="app">
+
+<aside class="sidebar">
+  <div class="brand"><div class="brand-icon">💡</div>LumiNote</div>
+  <div class="nav">
+    <button class="active" onclick="mostrarInicio()">⌂ &nbsp; Início</button>
+    <button onclick="filtrar('todas_pessoais')">📂 &nbsp; Minhas anotações</button>
+    <button onclick="filtrar('grupo')">👥 &nbsp; Grupos e trabalhos</button>
+    <button onclick="mostrarTarefas()">☑ &nbsp; Tarefas</button>
+    <button onclick="abrirChat()">💬 &nbsp; Conversas</button>
+    <button onclick="mostrarContatos()">👤 &nbsp; Contatos</button>
+  </div>
+  <div class="section-title">Mais</div>
+  <div class="side-bottom nav">
+    <button onclick="mostrarAjuda()">❓ &nbsp; Ajuda</button>
+    <button onclick="mostrarInfo()">ⓘ &nbsp; Informações</button>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div class="search">
+      <span>🔎</span>
+      <input id="busca" placeholder="Buscar notas, tarefas e funções..." oninput="buscar()">
+    </div>
+    <button class="iconbtn" onclick="abrirEditor()">＋ Nova anotação</button>
+    <button class="iconbtn" onclick="abrirChat()">💬</button>
+  </header>
+
+  <section class="content" id="content"></section>
+</main>
+
+<aside class="rightbar">
+  <h3>👥 Contatos</h3>
+  <div id="contacts"></div>
+  <div class="help">
+    <b>💡 Precisa de ajuda?</b>
+    <p style="color:#667085;font-size:13px;margin-top:5px">Converse com o assistente do LumiNote.</p>
+    <button onclick="abrirChat()">Abrir conversa</button>
+  </div>
+</aside>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-box" id="modalBox"></div>
+</div>
+
+<div class="chat" id="chat">
+ <div class="chat-box">
+   <div class="chat-head"><b>💬 Ajuda LumiNote</b><button class="close" onclick="fecharChat()">✕</button></div>
+   <div class="messages" id="messages">
+     <div class="msg"><b>Lumi:</b> Olá! Posso ajudar você a encontrar funções, organizar tarefas ou explicar como usar o app. 😊</div>
+     <div class="msg"><b>Lumi:</b> Experimente perguntar: “Como crio um trabalho em grupo?”</div>
+   </div>
+   <div class="chat-input">
+     <input id="chatInput" placeholder="Digite sua mensagem..." onkeydown="if(event.key==='Enter')enviarChat()">
+     <button class="primary" onclick="enviarChat()">Enviar</button>
+   </div>
+ </div>
+</div>
+
+<script>
+let notas=JSON.parse(localStorage.getItem("lumiNotas")||"[]");
+let tarefas=JSON.parse(localStorage.getItem("lumiTarefas")||"[]");
+let contatos=[
+ {nome:"Ana Souza",tel:"(62) 99999-1111",email:"ana@email.com",insta:"@anasouza"},
+ {nome:"João Pedro",tel:"(62) 98888-2222",email:"joao@email.com",insta:"@joaopedro"},
+ {nome:"Marina Lima",tel:"(62) 97777-3333",email:"marina@email.com",insta:"@marinalima"}
+];
+
+function entrar(){
+  const usuario=document.getElementById("loginUsuario").value.trim();
+  const senha=document.getElementById("loginSenha").value;
+  const erro=document.getElementById("loginError");
+  if(!usuario||!senha){erro.textContent="Preencha seu login e sua senha para continuar.";erro.style.display="block";return}
+  erro.style.display="none";
+  document.getElementById("entry").style.display="none";
+  document.getElementById("app").style.display="grid";
+  mostrarInicio();
+}
+function esqueceuSenha(event){
+  event.preventDefault();
+  const usuario=prompt("Digite seu Gmail para solicitar a recuperação da senha:");
+  if(usuario&&usuario.trim()){
+    alert("Solicitação registrada para o Gmail: "+usuario.trim()+"\\n\\nEsta versão é um protótipo local e ainda não envia e-mails de recuperação.");
+  }
+}
+function save(){localStorage.setItem("lumiNotas",JSON.stringify(notas));localStorage.setItem("lumiTarefas",JSON.stringify(tarefas))}
+function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+function mostrarInicio(){
+ const c=document.getElementById("content");
+ c.innerHTML=`
+ <div class="welcome"><div><h2>Olá! </h2><p>Organize suas ideias, estudos e trabalhos.</p></div><button class="primary" onclick="abrirEditor()">＋ Criar anotação</button></div>
+ <div class="cards">
+  <div class="stat"><b>${notas.length}</b><small>anotações</small></div>
+  <div class="stat"><b>${tarefas.length}</b><small>tarefas</small></div>
+  <div class="stat"><b>${notas.filter(n=>n.tipo==="grupo").length}</b><small>trabalhos em grupo</small></div>
+  <div class="stat"><b>${tarefas.filter(t=>t.prioridade==="alta"&&!t.feita).length}</b><small>urgentes</small></div>
+ </div>
+ <div class="grid">
+  <div class="panel"><h3>📝 Primeiras anotações</h3><div class="notes">${renderNotas(notas.slice(0,5))}</div></div>
+  <div class="panel"><h3>☑ Tarefas prioritárias</h3>${renderTarefas(5)}</div>
+ </div>`;
+}
+
+function renderNotas(listaNotas){
+ if(!listaNotas.length)return `<div class="empty">Nenhuma anotação encontrada.</div>`;
+ return listaNotas.map((n,i)=>{
+  const originalIndex = notas.indexOf(n);
+  const icone = n.tipo === "publica" ? "🌎" : n.tipo === "grupo" ? "👥" : "🔒";
+  const tagTexto = n.tipo === "grupo" ? "Grupo" : n.tipo === "publica" ? "Pública" : "Privada";
+  return `
+ <div class="note" onclick="abrirEditor(${originalIndex})">
+  <div class="icon-type">${icone}</div>
+  <div style="flex:1">
+    <h4>${esc(n.titulo)}</h4>
+    <p>${esc(n.texto).slice(0,130)}</p>
+  </div>
+  <span class="tag">${tagTexto}</span>
+ </div>`;
+ }).join("");
+}
+
+function renderTarefas(limite=99){
+ if(!tarefas.length)return `<div class="empty">Nenhuma tarefa cadastrada.</div>`;
+ return tarefas.slice(0,limite).map((t,i)=>`
+ <div class="task"><input type="checkbox" ${t.feita?"checked":""} onchange="concluir(${i})"><span style="${t.feita?'text-decoration:line-through;color:#9aa5b5':''}">${esc(t.nome)}</span><span class="priority ${t.prioridade==="alta"?"high":t.prioridade==="media"?"medium":"low"}">${t.prioridade}</span></div>`).join("")
+}
+
+function abrirEditor(index=null){
+ const n=index!==null?notas[index]:{titulo:"",texto:"",tipo:"privada",cor:"#6557f5",fonte:16,data:""};
+ document.getElementById("modalBox").innerHTML=`
+ <div class="modal-head"><h2>${index===null?"✨ Nova anotação":"✏️ Editar anotação"}</h2><button class="close" onclick="fecharModal()">✕</button></div>
+ <div class="form">
+  <input id="ntitulo" placeholder="Título da anotação" value="${esc(n.titulo)}">
+  <div class="toolbar">
+   <button onclick="formatar('bold')"><b>B</b></button><button onclick="formatar('italic')"><i>I</i></button>
+   <button onclick="formatar('underline')"><u>U</u></button>
+   <label>Cor <input type="color" id="ncor" value="${n.cor||"#6557f5"}"></label>
+   <select id="nfonte"><option value="14">Pequena</option><option value="16" selected>Normal</option><option value="20">Grande</option><option value="26">Título</option></select>
+   <button onclick="inserirImagem()">🖼 Imagem</button><button onclick="inserirGrafico()">📊 Gráfico</button><button onclick="alert('Gravação de áudio em breve.')">🎙 Áudio</button>
+  </div>
+  <textarea id="ntexto" style="font-size:${n.fonte||16}px" placeholder="Escreva sua anotação completa...">${esc(n.texto)}</textarea>
+  <div class="visibility">
+   <label class="choice"><input type="radio" name="tipo" value="privada" ${n.tipo==="privada"?"checked":""}> 🔒 Privada</label>
+   <label class="choice"><input type="radio" name="tipo" value="publica" ${n.tipo==="publica"?"checked":""}> 🌎 Pública</label>
+   <label class="choice"><input type="radio" name="tipo" value="grupo" ${n.tipo==="grupo"?"checked":""}> 👥 Grupo</label>
+  </div>
+  <input id="ndata" type="date" value="${n.data||""}">
+  <button class="primary" onclick="salvarNota(${index===null?"null":index})">💾 Salvar anotação</button>
+ </div>`;
+ document.getElementById("modal").style.display="grid";
+ document.getElementById("nfonte").onchange=e=>document.getElementById("ntexto").style.fontSize=e.target.value+"px";
+}
+function formatar(cmd){document.execCommand(cmd,false,null);document.getElementById("ntexto").focus()}
+function inserirImagem(){alert("Upload de imagem em desenvolvimento.")}
+function inserirGrafico(){alert("Inserção de gráficos em desenvolvimento.")}
+function salvarNota(index){
+ const obj={titulo:document.getElementById("ntitulo").value||"Sem título",texto:document.getElementById("ntexto").value,tipo:document.querySelector('input[name="tipo"]:checked').value,cor:document.getElementById("ncor").value,fonte:document.getElementById("nfonte").value,data:document.getElementById("ndata").value};
+ if(index===null)notas.unshift(obj);else notas[index]=obj;
+ save();fecharModal();mostrarInicio();
+}
+function fecharModal(){document.getElementById("modal").style.display="none"}
+function filtrar(tipo){
+ const c=document.getElementById("content");
+ let lista = [];
+ let titulo = "";
+ let descricao = "";
+
+ if (tipo === "todas_pessoais") {
+   lista = notas.filter(n => n.tipo === "privada" || n.tipo === "publica");
+   titulo = "📂 Minhas Anotações";
+   descricao = "Anotações públicas (🌎) e privadas (🔒) reunidas na mesma pasta.";
+ } else if (tipo === "grupo") {
+   lista = notas.filter(n => n.tipo === "grupo");
+   titulo = "👥 Trabalhos em Grupo";
+   descricao = "Anotações compartilhadas com suas equipes.";
+ }
+
+ c.innerHTML=`<div class="welcome"><div><h2>${titulo}</h2><p>${descricao}</p></div><button class="primary" onclick="abrirEditor()">＋ Nova</button></div><div class="panel"><div class="notes">${renderNotas(lista)}</div></div>`;
+}
+
+function mostrarTarefas(){
+ document.getElementById("content").innerHTML=`<div class="welcome"><div><h2>☑ Tarefas e atividades</h2><p>Priorize o que precisa ser feito primeiro.</p></div><button class="primary" onclick="novaTarefa()">＋ Nova tarefa</button></div><div class="panel"><div class="notes">${renderTarefas()}</div></div>`;
+}
+function novaTarefa(){
+ const nome=prompt("Nome da tarefa:");
+ if(!nome)return;
+ const prioridade=prompt("Prioridade: alta, media ou baixa","media")||"media";
+ tarefas.unshift({nome,prioridade,feita:false});save();mostrarTarefas()
+}
+function concluir(i){tarefas[i].feita=!tarefas[i].feita;save();mostrarTarefas()}
+function mostrarContatos(){
+ document.getElementById("content").innerHTML=`<div class="welcome"><div><h2>👤 Contatos</h2><p>Encontre pessoas para conversar e trabalhar em grupo.</p></div></div><div class="panel">${contatos.map(c=>`<div class="contact"><div class="avatar">${c.nome[0]}</div><div><b>${esc(c.nome)}</b><small>📞 ${c.tel}</small><small>✉ ${c.email}</small><small>◎ ${c.insta}</small></div></div>`).join("")}</div>`
+}
+function buscar(){
+ const q=document.getElementById("busca").value.toLowerCase();
+ if(!q){mostrarInicio();return}
+ const ns=notas.filter(n=>(n.titulo+" "+n.texto).toLowerCase().includes(q));
+ const ts=tarefas.filter(t=>t.nome.toLowerCase().includes(q));
+ document.getElementById("content").innerHTML=`<div class="welcome"><div><h2>🔎 Resultados</h2><p>Encontramos ${ns.length} anotações e ${ts.length} tarefas.</p></div></div><div class="grid"><div class="panel"><h3>Anotações</h3><div class="notes">${renderNotas(ns)}</div></div><div class="panel"><h3>Tarefas</h3>${ts.length?ts.map(t=>`<div class="task">☑ ${esc(t.nome)}</div>`).join(""):"<div class='empty'>Nenhuma tarefa encontrada.</div>"}</div></div>`;
+}
+function abrirChat(){document.getElementById("chat").style.display="block";document.getElementById("chatInput").focus()}
+function fecharChat(){document.getElementById("chat").style.display="none"}
+function enviarChat(){
+ const input=document.getElementById("chatInput");const text=input.value.trim();if(!text)return;
+ const box=document.getElementById("messages");box.innerHTML+=`<div class="msg me">${esc(text)}</div>`;
+ let resposta="Posso ajudar com anotações, tarefas, grupos, privacidade, busca e organização.";
+ if(text.toLowerCase().includes("grupo"))resposta="Para trabalhos em grupo, crie uma anotação e selecione 👥 Grupo.";
+ if(text.toLowerCase().includes("privad"))resposta="Anotações privadas são marcadas com um cadeado (🔒) e ficam na pasta Minhas Anotações.";
+ if(text.toLowerCase().includes("tarefa"))resposta="Você pode criar tarefas e marcar a prioridade como alta, média ou baixa.";
+ setTimeout(()=>{box.innerHTML+=`<div class="msg"><b>Lumi:</b> ${resposta}</div>`;box.scrollTop=box.scrollHeight},350);
+ input.value="";
+}
+function mostrarAjuda(){abrirChat()}
+function mostrarInfo(){
+ document.getElementById("modalBox").innerHTML=`<div class="modal-head"><h2>ⓘ Sobre o LumiNote</h2><button class="close" onclick="fecharModal()">✕</button></div><p style="line-height:1.7;color:#667085">LumiNote é um protótipo de bloco de notas para estudantes com suporte a tarefas, privacidade e grupos.</p>`;
+ document.getElementById("modal").style.display="grid";
+}
+document.getElementById("contacts").innerHTML=contatos.map(c=>`<div class="contact"><div class="avatar">${c.nome[0]}</div><div><b>${c.nome}</b><small>${c.email}</small><small>${c.insta}</small></div></div>`).join("");
+</script>
+</body>
+</html>
